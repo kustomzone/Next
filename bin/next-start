@@ -2,7 +2,8 @@
 
 import { resolve } from 'path'
 import parseArgs from 'minimist'
-import Server from '../server'
+import server from '../server'
+import run from './util/run';
 
 const argv = parseArgs(process.argv.slice(2), {
   alias: {
@@ -17,11 +18,9 @@ const argv = parseArgs(process.argv.slice(2), {
 
 const dir = resolve(argv._[0] || '.')
 
-const srv = new Server({ dir })
-srv.start(argv.port)
-.then(() => {
-  console.log('> Ready on http://localhost:%d', argv.port)
-})
+const srv = new server({ dir })
+
+run(srv, argv.port)
 .catch((err) => {
   console.error(err)
   process.exit(1)
