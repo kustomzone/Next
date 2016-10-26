@@ -1,0 +1,20 @@
+#!/usr/bin/env node
+
+import { resolve } from 'path'
+import parseArgs from 'minimist'
+import build from '../server/build'
+
+const argv = parseArgs(process.argv.slice(2), {
+  alias: {
+    h: 'help'
+  },
+  boolean: ['h']
+})
+
+const dir = resolve(argv._[0] || '.')
+
+build(dir)
+.catch((err) => {
+  console.error(err)
+  process.exit(1)
+})

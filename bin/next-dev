@@ -1,0 +1,40 @@
+#!/usr/bin/env node
+import { resolve, join } from 'path'
+import parseArgs from 'minimist'
+import { exists } from 'mz/fs'
+import Server from '../server'
+import clean from '../server/build/clean'
+
+const argv = parseArgs(process.argv.slice(2), {
+  alias: {
+    h: 'help',
+    p: 'port'
+  },
+  boolean: ['h'],
+  default: {
+    p: 3000
+  }
+})
+
+const dir = resolve(argv._[0] || '.')
+
+clean(dir)
+.then(async () => {
+  const srv = new Server({ dir, dev: true, hotReload: true })
+  await srv.start(argv.port)
+  console.log('> Ready on http://localhost:%d', argv.port)
+
+  // Check if pages dir exists and warn if not
+  if (!(await exists(join(dir, 'pages')))) {
+    if (await exists(join(dir, '..', 'pages'))) {
+      console.error('> No `pages` directory found. Did you mean to run `next` in the parent (`../`) directory?')
+    } else {
+      console.error('> Couldn\'t find a `pages` directory. Please create one under the project root')
+    }
+    process.exit(1)
+  }
+})
+.catch((err) => {
+  console.error(err)
+  process.exit(1)
+})
