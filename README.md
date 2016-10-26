@@ -10,6 +10,16 @@ Install it:
 $ npm install next --save
 ```
 
+and add a script to your package.json like this:
+
+```json
+{
+  "scripts": {
+    "start": "next"
+  }
+}
+```
+
 After that, the file-system is the main API. Every `.js` file becomes a route that gets automatically processed and rendered.
 
 Populate `./pages/index.js` inside your project:
@@ -21,7 +31,7 @@ export default () => (
 )
 ```
 
-and then just run `next` and go to `http://localhost:3000`
+and then just run `npm start` and go to `http://localhost:3000`
 
 So far, we get:
 
@@ -44,7 +54,7 @@ export default () => (
 )
 ```
 
-That means pages never load unneccessary code!
+That means pages never load unnecessary code!
 
 ### CSS
 
@@ -140,7 +150,7 @@ Client-side routing behaves exactly like the native UA:
 
 Each top-level component receives a `url` property with the following API:
 
-- `pathname` - `String` of the current path excluding the query string
+- `path` - `String` of the current path excluding the query string
 - `query` - `Object` with the parsed query string. Defaults to `{}`
 - `push(url)` - performs a `pushState` call associated with the current component
 - `replace(url)` - performs a `replaceState` call associated with the current component
@@ -261,7 +271,7 @@ Since every class name is invoked with the `css()` helper, Next.js can intellige
 
 This is important for server-side rendering, but also during the lifecycle of the page. Since Next.js enables `pushState` transitions that load components dynamically, unnecessary `<style>` elements would bring down performance over time.
 
-This is a very signifcant benefit over approaches like `require(‘xxxxx.css')`.
+This is a very significant benefit over approaches like `require(‘xxxxx.css')`.
 
 ### Correctness
 
