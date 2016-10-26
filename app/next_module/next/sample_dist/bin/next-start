@@ -1,0 +1,36 @@
+#!/usr/bin/env node
+'use strict';
+
+var _path = require('path');
+
+var _minimist = require('minimist');
+
+var _minimist2 = _interopRequireDefault(_minimist);
+
+var _server = require('../server');
+
+var _server2 = _interopRequireDefault(_server);
+
+var run = require('./util/run.js');
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+var argv = (0, _minimist2.default)(process.argv.slice(2), {
+  alias: {
+    h: 'help',
+    p: 'port'
+  },
+  boolean: ['h'],
+  default: {
+    p: 3000
+  }
+});
+
+var dir = (0, _path.resolve)(argv._[0] || '.');
+var srv = new _server2.default({ dir: dir });
+
+run.default(srv,argv.port)
+.catch(function (err) {
+  console.error(err);
+  process.exit(1);
+});
