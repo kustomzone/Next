@@ -6,6 +6,8 @@ import Router from './router'
 import { render, renderAPI, renderJSON, errorToJSON } from './render'
 import HotReloader from './hot-reloader'
 import { resolveFromList } from './resolve'
+import requireModule from './require'
+import glob from 'glob-promise'
 
 export default class Server {
   constructor ({ dir = '.', dev = false, hotReload = false }) {
@@ -23,6 +25,19 @@ export default class Server {
       })
     })
 
+    // @TODO: workaround delay between server starting and webpack transpiling plugins
+    // and emitting them in the final dir
+    setTimeout(() => { this.getRoutes(); console.log('loaded routes') }, 10000)
+  }
+
+  async getRoutes () {
+    const plugins = await glob('plugins/**/*.js')
+    for (const p of plugins) {
+      const plugin = await requireModule(join(this.dir, '.next', 'dist', p).replace(/\\/g, '/'))
+      if (plugin.default) {
+        plugin.default(this.addRoute.bind(this))
+      }
+    }
     this.defineRoutes()
   }
 
@@ -39,6 +54,11 @@ export default class Server {
     })
   }
 
+  addRoute (path, fn, method = 'GET') {
+    const { dir, dev } = this
+    this.router.add(method.toUpperCase(), path, async (req, res, params) => fn(req.url, { req, res, params }, { dir, dev }))
+  }
+
   defineRoutes () {
     this.router.get('/_next/:path+', async (req, res, params) => {
       const p = join(__dirname, '..', 'client', ...(params.path || []))
@@ -48,10 +68,6 @@ export default class Server {
     this.router.get('/static/:path+', async (req, res, params) => {
       const p = join(this.dir, 'static', ...(params.path || []))
       await this.serveStatic(req, res, p)
-    })
-
-    this.router.get('/api/:path+', async (req, res, params) => {
-      await this.renderAPI(req, res, params)
     })
 
     this.router.get('/:path+.json', async (req, res) => {

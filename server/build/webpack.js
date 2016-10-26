@@ -10,7 +10,7 @@ import DynamicEntryPlugin from './plugins/dynamic-entry-plugin'
 export default async function createCompiler (dir, { hotReload = false } = {}) {
   dir = resolve(dir)
 
-  const entries = await glob('+(pages|api)/**/*.js', { cwd: dir })
+  const entries = await glob('!(node_modules|static)/**/*.js', { cwd: dir })
 
   const entry = {}
   const defaultEntries = hotReload ? ['webpack/hot/dev-server'] : []
@@ -19,7 +19,6 @@ export default async function createCompiler (dir, { hotReload = false } = {}) {
   }
 
   const nextPagesDir = join(__dirname, '..', '..', 'pages')
-  const nextApiDir = join(__dirname, '..', '..', 'api')
 
   const errorEntry = join('bundles', 'pages', '_error.js')
   const defaultErrorPath = join(nextPagesDir, '_error.js')
@@ -32,6 +31,9 @@ export default async function createCompiler (dir, { hotReload = false } = {}) {
   const nodeModulesDir = join(__dirname, '..', '..', '..', 'node_modules')
 
   const plugins = [
+    new webpack.DefinePlugin({
+      'process.env.NODE_ENV': JSON.stringify('production')
+    }),
     new WriteFilePlugin({
       exitOnErrors: false,
       log: false,
@@ -57,10 +59,7 @@ export default async function createCompiler (dir, { hotReload = false } = {}) {
   const loaders = [{
     test: /\.js$/,
     loader: 'emit-file-loader',
-    include: [dir, nextPagesDir, nextApiDir],
-    exclude (str) {
-      return /node_modules/.test(str) && str.indexOf(nextPagesDir) !== 0 && str.indexOf(nextApiDir) !== 0
-    },
+    exclude: /node_modules/,
     query: {
       name: 'dist/[path][name].[ext]'
     }
@@ -68,15 +67,12 @@ export default async function createCompiler (dir, { hotReload = false } = {}) {
   .concat(hotReload ? [{
     test: /\.js$/,
     loader: 'hot-self-accept-loader',
-    include: [join(dir, 'pages'), join(dir, 'api')]
+    exclude: /node_modules/
   }] : [])
   .concat([{
     test: /\.js$/,
     loader: 'babel',
-    include: [dir, nextPagesDir, nextApiDir],
-    exclude (str) {
-      return /node_modules/.test(str) && str.indexOf(nextPagesDir) !== 0 && str.indexOf(nextApiDir) !== 0
-    },
+    exclude: /node_modules/,
     query: {
       presets: ['es2015', 'react'],
       plugins: [
