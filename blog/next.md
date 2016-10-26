@@ -139,7 +139,7 @@ export class exports React.Component {
 Our stance of what features we transpile (like async/await) can be summed up as: we target V8's capabilities. Since our goal is code-sharing between server and client, this gives us great performance when executing the code on Node and developing on Chrome or Brave, for example.
 
 As you can see, the contract is very simple and unopinionated: getInitialProps must return a Promise that resolves to a `JavaScript` object, which then populates the component's props.
-This makes Next.js play well with REST APIs, GraphQL and even global-state management libraries Redux, an example of which you can find on our wiki.
+This makes Next.js play well with REST APIs, GraphQL and even global-state management libraries like Redux, an example of which you can find on our wiki.
 The same method allows for different data to be loaded depending on whether the component is server-rendered or dynamically rendered through client-side routing:
 
 static async getInitialProps ({ res }) {
