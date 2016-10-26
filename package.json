@@ -3,6 +3,7 @@
   "version": "1.0.0",
   "description": "Minimalistic framework for server-rendered React applications",
   "main": "./dist/lib/index.js",
+  "homepage": "https://github.com/zeit/next.js",
   "license": "MIT",
   "repository": "zeit/next.js",
   "files": [
