@@ -1,6 +1,6 @@
 ## Next.js 
 
-Quick copy of blog post below without ani-gifs. (that post is currently causing hard crashes in Chome/Chromium, probably due to gif rendering - *still checking..*)
+Quick copy of blog post below. That post is (currently) causing tab crashes in Chome/Chromium (or hard crash if memory is low) due to large animated gif conflicting with svg button icons.
 
 https://zeit.co/blog/next
 
