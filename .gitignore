@@ -1,3 +1,7 @@
+# app
+app/.next
+app/node_modules
+
 # build output
 dist
 
@@ -7,6 +11,3 @@ node_modules
 
 # logs
 npm-debug.log
-
-# other
-.next

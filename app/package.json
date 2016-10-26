@@ -1,0 +1,19 @@
+{
+  "name": "app",
+  "version": "0.0.1",
+  "description": "next.js examples",
+  "scripts": {
+    "start": "next",
+    "test": "jest"
+  },
+  "author": "github.com/kustomzone",
+  "license": "Unlicence",
+  "dependencies": {
+    "next": "^1.0.0"
+  },
+  "devDependencies": {
+    "babel-jest": "^16.0.0",
+    "enzyme": "^2.5.1",
+    "jest": "^16.0.2"
+  }
+}
