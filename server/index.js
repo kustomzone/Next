@@ -3,7 +3,7 @@ import { resolve, join } from 'path'
 import { parse } from 'url'
 import send from 'send'
 import Router from './router'
-import { render, renderJSON, errorToJSON } from './render'
+import { render, renderAPI, renderJSON, errorToJSON } from './render'
 import HotReloader from './hot-reloader'
 import { resolveFromList } from './resolve'
 
@@ -50,6 +50,10 @@ export default class Server {
       await this.serveStatic(req, res, p)
     })
 
+    this.router.get('/api/:path+', async (req, res, params) => {
+      await this.renderAPI(req, res, params)
+    })
+
     this.router.get('/:path+.json', async (req, res) => {
       await this.renderJSON(req, res)
     })
@@ -94,6 +98,15 @@ export default class Server {
     }
 
     sendHTML(res, html)
+  }
+
+  async renderAPI (req, res, params) {
+    const { dir, dev } = this
+    const data = await renderAPI(req.url, { req, res, params }, { dir, dev })
+    const json = JSON.stringify(data)
+    res.setHeader('Content-Type', 'application/json')
+    res.setHeader('Content-Length', Buffer.byteLength(json))
+    res.end(json)
   }
 
   async renderJSON (req, res) {

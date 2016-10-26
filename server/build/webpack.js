@@ -10,15 +10,16 @@ import DynamicEntryPlugin from './plugins/dynamic-entry-plugin'
 export default async function createCompiler (dir, { hotReload = false } = {}) {
   dir = resolve(dir)
 
-  const pages = await glob('pages/**/*.js', { cwd: dir })
+  const entries = await glob('+(pages|api)/**/*.js', { cwd: dir })
 
   const entry = {}
   const defaultEntries = hotReload ? ['webpack/hot/dev-server'] : []
-  for (const p of pages) {
+  for (const p of entries) {
     entry[join('bundles', p)] = defaultEntries.concat(['./' + p])
   }
 
   const nextPagesDir = join(__dirname, '..', '..', 'pages')
+  const nextApiDir = join(__dirname, '..', '..', 'api')
 
   const errorEntry = join('bundles', 'pages', '_error.js')
   const defaultErrorPath = join(nextPagesDir, '_error.js')
@@ -56,9 +57,9 @@ export default async function createCompiler (dir, { hotReload = false } = {}) {
   const loaders = [{
     test: /\.js$/,
     loader: 'emit-file-loader',
-    include: [dir, nextPagesDir],
+    include: [dir, nextPagesDir, nextApiDir],
     exclude (str) {
-      return /node_modules/.test(str) && str.indexOf(nextPagesDir) !== 0
+      return /node_modules/.test(str) && str.indexOf(nextPagesDir) !== 0 && str.indexOf(nextApiDir) !== 0
     },
     query: {
       name: 'dist/[path][name].[ext]'
@@ -67,14 +68,14 @@ export default async function createCompiler (dir, { hotReload = false } = {}) {
   .concat(hotReload ? [{
     test: /\.js$/,
     loader: 'hot-self-accept-loader',
-    include: join(dir, 'pages')
+    include: [join(dir, 'pages'), join(dir, 'api')]
   }] : [])
   .concat([{
     test: /\.js$/,
     loader: 'babel',
-    include: [dir, nextPagesDir],
+    include: [dir, nextPagesDir, nextApiDir],
     exclude (str) {
-      return /node_modules/.test(str) && str.indexOf(nextPagesDir) !== 0
+      return /node_modules/.test(str) && str.indexOf(nextPagesDir) !== 0 && str.indexOf(nextApiDir) !== 0
     },
     query: {
       presets: ['es2015', 'react'],

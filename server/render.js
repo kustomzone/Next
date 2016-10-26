@@ -52,6 +52,30 @@ export async function render (url, ctx = {}, {
   return '<!DOCTYPE html>' + renderToStaticMarkup(doc)
 }
 
+export async function renderAPI (url, { req, res, params }, {
+  dir = process.cwd(),
+  dev = false
+} = {}) {
+  try {
+    const mod = await requireModule(join(dir, '.next', 'dist', getPath(url)))
+    const fn = mod.default
+
+    if (!fn) {
+      throw new Error('Endpoint is malformed; `export default function ({req, res, params}, {dir, dev}) { /* ... */ }`')
+    }
+
+    return {
+      success: true,
+      body: fn({ req, res, params }, { dir, dev })
+    }
+  } catch (e) {
+    return {
+      error: true,
+      message: dev ? e.message : 'Internal server error'
+    }
+  }
+}
+
 export async function renderJSON (url, { dir = process.cwd() } = {}) {
   const path = getPath(url)
   const component = await read(join(dir, '.next', 'bundles', 'pages', path))
